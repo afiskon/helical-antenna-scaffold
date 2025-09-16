@@ -1,25 +1,27 @@
 /*
-* dereksgc customizable helical antenna scaffold v5
-* Changes can be tracked at https://github.com/sgcderek/dsgc-helix-scaffold/blob/funny/dsgc_helix_v5.scad
-* Check the repo for future updated versions
-*/
+ * dereksgc customizable helical antenna scaffold v5
+ *   https://github.com/sgcderek/dsgc-helix-scaffold/
+ *
+ * Modified by Alex, R2AUK
+ *   https://github.com/afiskon/helical-antenna-scaffold
+ */
 
 /* [Basic settings] */
 
-// Operating frequency of the helix
-Frequency = 1700;
+// Operating frequency of the helix (MHz)
+Frequency = 2450;
 
 // Spacing between turns (wl)
-Spacing = 0.14;
+Spacing = 0.23; // [0.22..0.24]
 
 // Number of turns of the helix
-Turns = 6;
+Turns = 5; // [3..25]
 
 // Polarization of the helix
 Polarization = "LHCP"; //[RHCP,LHCP]
 
 // Diameter of the holes for the helix conductor (mm)
-Cutout_diameter = 4;
+Cutout_diameter = 3.5;
 
 // How much of the first turn is parallel to the reflector
 Parallel_turn = 0.25;
@@ -30,7 +32,7 @@ $fn = 50;
 /* [Leg settings] */
 
 // Width of the inner leg wall (mm)
-Inner_leg_width = 4;
+Inner_leg_width = 3;
 
 // Width of the outer leg wall (mm)
 Outer_leg_width = 13;
@@ -54,11 +56,8 @@ Enable_cutout = true;
 
 /* [Strut settings] */
 
-// Thicknes of the top part of each strut (mm)
-Strut_thickness = 3;
-
 // Angle at which struts are generated (deg)
-Strut_angle = 55;
+Strut_angle = 60;
 
 // Generate a strut at the base of the scaffold
 Bottom_strut = true;
@@ -78,10 +77,10 @@ Top_strut_offset = 0;
 /* [Mounting settings] */
 
 // Distance between the two mounting holes (mm)
-Mounting_separation = 90;
+Mounting_separation = 70;
 
 // Diameter of the mounting holes (mm)
-Mounting_diameter = 10;
+Mounting_diameter = 7;
 
 // Thickness of the rim around each mounting hole (mm)
 Mounting_thickness = 5;
@@ -95,7 +94,7 @@ Mounting_rotation = 0;
 Enable_text = true;
 
 // Custom decoration text (set to none to disable)
-Decoration_text = "DEREKSGC";
+Decoration_text = "Alex R2AUK        2025";
 
 // Depth of the text engraving (mm)
 Text_depth = 0.75;
@@ -120,8 +119,42 @@ C = 299792458;
 // Wavelength of the helix frequency (mm)
 Wavelength = C/Frequency/1000;
 
+// Gain and diameter are determined using approximations of the plots
+// provided by Igor, DL2KQ http://dl2kq.de/ant/kniga/1345.htm
+Gain = (-0.18*pow(Turns, 2) + 0.57*Turns - 12.63) * exp(-0.16 * Turns) + 19;
+echo(str("Approximate gain: ", ceil(Gain * 10) / 10, " dBi"));
+
+// Diameter of the helix (wl)
+Diameter_wl = ceil((0.2467 * pow(Turns, -0.2666) + 0.2172)*1000)/1000;
+
 // Diameter of the helix (mm)
-Diameter = Wavelength/PI;
+Diameter = ceil(Wavelength * Diameter_wl * 10) / 10;
+echo(str("Helix diameter: ", Diameter_wl, " wl, ", Diameter, " mm"));
+
+Wire_length = ceil(Diameter * PI * Turns);
+echo(str("Approximate wire length: ", Wire_length, " mm"));
+
+Refl_round_dia = ceil(0.8 * Wavelength);
+echo(str("Round reflector diameter: ", Refl_round_dia, " mm"));
+
+Refl_square_size = ceil(1.1 * Wavelength);
+echo(str("Square reflector size: ", Refl_square_size, " mm"));
+
+ra_to_wire_dia_wl = [
+    [240, 0.005],
+    [190, 0.01],
+    [140, 0.02],
+    [115, 0.03],
+    [87,  0.04],
+    [75,  0.05],
+    [50,  0.07],
+];
+
+for(item = ra_to_wire_dia_wl) {
+    ra = item[0];
+    dia = ceil(item[1] * Wavelength * 10)/10;
+    echo(str("Wire diameter for ", ra, " Ohm input impedance: ", dia, " mm"));
+}
 
 // Distance between turns (mm)
 Spacing_distance = Wavelength*Spacing;
@@ -144,20 +177,20 @@ Strut_offset = ((Diameter/2)/tan(Strut_angle))-Leg_wall_distance/2;
 // Total scaffold height (mm)
 Total_height = (Turns_rounded*Spacing_distance+Cutout_diameter*3)-Spacing_distance*Parallel_turn;
 
+// Thicknes of the top part of each strut (mm)
+Strut_thickness = 3; // Total_height;
+
 // Font used for the text on the leg
 Text_font = "DejaVu Sans:style=Bold";
 
 // Size of the text
 Text_size = Outer_leg_width*0.75*Text_size_multiplier;
 
-// Shortened polarization text
-Polarization_label = (Polarization == "RHCP") ? "R" : "L";
-
 // Frequency text
-Text_frequency = str(Frequency,Polarization_label);
+Text_frequency = str(Frequency, " MHz          ", Polarization /*, " ", Material*/);
 
 // ID text
-Text_ID = str(round(Turns_rounded*10)/10, "T", Spacing, "S");
+Text_ID = str(Turns, " TURNS    ", Spacing, " STEP");
 
 // Difference between legs and leg cutouts
 difference(){
@@ -381,9 +414,9 @@ difference(){
     union(){
         // Segment cutout
         if (Enable_cutout){
-            rotate([0,0,-60])
+            rotate([0,0,-45])
             color(Scaffold_color)
-            rotate_extrude(angle=120)
+            rotate_extrude(angle=90)
             translate([Diameter/2+Base_width/2,0,0])
             square([Base_width*2+Cutout_diameter*1.5,Base_thickness*3],center=true);
         }
