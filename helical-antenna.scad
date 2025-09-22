@@ -24,6 +24,11 @@ Polarization = "LHCP"; //[RHCP,LHCP]
 Cutout_diameter = 3.5;
 
 // How much of the first turn is parallel to the reflector
+// This turn is used as a quarter wave impedance transformer
+// with a "wire over ground" transmission line.
+// See:
+// - https://en.wikipedia.org/wiki/Quarter-wave_impedance_transformer
+// - https://www.microwaves101.com/encyclopedias/wire-over-ground-transmission-line
 Parallel_turn = 0.25;
 
 // Face number (OpenSCAD/Customizer parameter)
