@@ -51,7 +51,7 @@ Leg_type = "T-Beam"; //[Trapezoid,T-Beam,H-Beam]
 /* [Base settings] */
 
 // Base width (mm)
-Base_width = 10;
+Base_width = 5;
 
 // Base thickness (mm)
 Base_thickness = 4;

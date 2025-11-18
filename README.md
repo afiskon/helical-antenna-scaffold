@@ -8,5 +8,8 @@ calculator. The calculation method is based on the [book by Igor, DL2KQ][2].
 You only specify the desired frequency and optionally other parameters.
 The math is done by OpenSCAD.
 
+Also this repository includes an antenna cover and LNB mount for QO-100
+operation. The models are optimized for Bullseye LNB.
+
 [1]: https://github.com/sgcderek
 [2]: http://dl2kq.de/ant/kniga/1345.htm

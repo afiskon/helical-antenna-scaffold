@@ -1,0 +1,424 @@
+/*
+ * dereksgc customizable helical antenna scaffold v5
+ *   https://github.com/sgcderek/dsgc-helix-scaffold/
+ *
+ * Modified by Alex, R2AUK
+ *   https://github.com/afiskon/helical-antenna-scaffold
+ */
+
+/* [Basic settings] */
+
+// Operating frequency of the helix (MHz)
+Frequency = 2405;
+
+// Spacing between turns (wl)
+Spacing = 0.23; // [0.22..0.24]
+
+// Number of turns of the helix
+Turns = 5; // [3..25]
+
+// Polarization of the helix
+Polarization = "LHCP"; //[RHCP,LHCP]
+
+// Diameter of the holes for the helix conductor (mm)
+Cutout_diameter = 3.5;
+
+// How much of the first turn is parallel to the reflector
+// This turn is used as a quarter wave impedance transformer
+// with wire over ground transmission line.
+// See:
+// - https://en.wikipedia.org/wiki/Quarter-wave_impedance_transformer
+// - https://www.microwaves101.com/encyclopedias/wire-over-ground-transmission-line
+Parallel_turn = 0.25;
+
+// Face number (OpenSCAD/Customizer parameter)
+$fn = 50;
+
+/* [Leg settings] */
+
+// Width of the inner leg wall (mm)
+Inner_leg_width = 3;
+
+// Width of the outer leg wall (mm)
+Outer_leg_width = 13;
+
+// Distance between inner and outer leg walls (mm)
+Leg_wall_distance = 12;
+
+// Type of leg cross-section to extrude
+Leg_type = "T-Beam"; //[Trapezoid,T-Beam,H-Beam]
+
+/* [Base settings] */
+
+// Base width (mm)
+Base_width = 5;
+
+// Base thickness (mm)
+Base_thickness = 4;
+
+// Cut out a third of the base (space for matching, connector, etc.)
+Enable_cutout = true;
+
+/* [Strut settings] */
+
+// Angle at which struts are generated (deg)
+Strut_angle = 60;
+
+// Generate a strut at the base of the scaffold
+Bottom_strut = false;
+
+// How much to shift the bottom strut up (mm)
+Bottom_strut_offset = 0;
+
+// Generate a strut in the middle of the scaffold (recommended for tall scaffolds)
+Middle_strut = true;
+
+// Generate a strut at the top of the scaffold (recommended for most scaffolds)
+Top_strut = true;
+
+// How much to shift the top strut down (mm)
+Top_strut_offset = 0;
+
+/* [Mounting settings] */
+
+// Distance between the two mounting holes (mm)
+Mounting_separation = 80;
+
+// Diameter of the mounting holes (mm)
+Mounting_diameter = 7;
+
+// Thickness of the rim around each mounting hole (mm)
+Mounting_thickness = 5;
+
+// Rotational offset of the mounting holes (deg)
+Mounting_rotation = 0;
+
+/* [Text settings] */
+
+// Enable engraved ID and decoration text
+Enable_text = true;
+
+// Custom decoration text (set to none to disable)
+Decoration_text = "ES'HAIL 2        QO-100";
+
+// Depth of the text engraving (mm)
+Text_depth = 0.75;
+
+// Modifies the size of the text (can be lowered if text is too long)
+Text_size_multiplier = 0.8;
+
+/* [Hidden] */
+
+// Polarization modifier (RHCP = 1, LHCP = -1)
+Pol_modifier = (Polarization == "RHCP") ? 1 : -1;
+
+// This rounds down the turn number to not render too much unused scaffold area (somehow?)
+Turns_rounded = floor((Turns+0.01)/(1/3))*(1/3)-(1/6);
+
+// Speed of light (m/s)
+C = 299792458;
+
+// Wavelength of the helix frequency (mm)
+Wavelength = C/Frequency/1000;
+
+// Gain and diameter are determined using approximations of the plots
+// provided by Igor, DL2KQ http://dl2kq.de/ant/kniga/1345.htm
+Gain = (-0.18*pow(Turns, 2) + 0.57*Turns - 12.63) * exp(-0.16 * Turns) + 19;
+echo(str("Approximate gain: ", ceil(Gain * 10) / 10, " dBi"));
+
+// Diameter of the helix (wl)
+Diameter_wl = ceil((0.2467 * pow(Turns, -0.2666) + 0.2172)*1000)/1000;
+
+// Diameter of the helix (mm)
+Diameter = ceil(Wavelength * Diameter_wl * 10) / 10;
+echo(str("Helix diameter: ", Diameter_wl, " wl, ", Diameter, " mm"));
+
+Wire_length = ceil(Diameter * PI * Turns);
+echo(str("Approximate wire length: ", Wire_length, " mm"));
+
+Refl_round_dia = ceil(0.8 * Wavelength);
+echo(str("Round reflector diameter: ", Refl_round_dia, " mm"));
+
+Refl_square_size = ceil(1.1 * Wavelength);
+echo(str("Square reflector size: ", Refl_square_size, " mm"));
+
+ra_to_wire_dia_wl = [
+    [240, 0.005],
+    [190, 0.01],
+    [140, 0.02],
+    [115, 0.03],
+    [87,  0.04],
+    [75,  0.05],
+    [50,  0.07],
+];
+
+for(item = ra_to_wire_dia_wl) {
+    ra = item[0];
+    dia = ceil(item[1] * Wavelength * 10)/10;
+    echo(str("Wire diameter for ", ra, " Ohm input impedance: ", dia, " mm"));
+}
+
+// Distance between turns (mm)
+Spacing_distance = Wavelength*Spacing;
+
+// Circumference of the helix (mm)
+Circumference = PI*Diameter;
+
+// Helix pitch (deg)
+Pitch = atan(Spacing_distance/Circumference)*Pol_modifier;
+
+// Calculate total number of segments in helix
+Total_segments = Turns * 3;
+
+// Calculate the length of each segment (slightly longer than longest leg dimension, mm)
+Segment_height = max(Inner_leg_width, Outer_leg_width)*1.1;
+
+// Calculate offset of the bottom corner of the strut base from the desired overhang angle
+Strut_offset = ((Diameter/2)/tan(Strut_angle))-Leg_wall_distance/2;
+
+// Total scaffold height (mm)
+Total_height = (Turns_rounded*Spacing_distance+Cutout_diameter*3)-Spacing_distance*Parallel_turn;
+
+// Thicknes of the top part of each strut (mm)
+Strut_thickness = 3; // Total_height;
+
+// Font used for the text on the leg
+Text_font = "DejaVu Sans:style=Bold";
+
+// Size of the text
+Text_size = Outer_leg_width*0.75*Text_size_multiplier;
+
+// Frequency text
+Text_frequency = str(Frequency, " MHz          ", Polarization /*, " ", Material*/);
+
+// ID text
+Text_ID = str(Turns, " TURNS    ", Spacing, " STEP");
+
+// Difference between legs and leg cutouts
+difference(){
+
+    // Generate legs
+    for (Leg = [1:1:3]){
+        
+        // Rotate each leg in place (120° increments)
+        rotate([0,0,Leg*120-60])
+            
+        // Translate each leg in place
+        translate([Diameter/2,0,0])
+            
+        // Face leg inwards
+        rotate([0,0,-90])
+        
+        // Leg union
+        union(){
+        
+            // Extrude leg from base polygon
+            linear_extrude(height=Total_height){
+                
+                // Leg base polygon
+                if (Leg_type == "Trapezoid"){
+                    polygon([
+                    [-Outer_leg_width/2,Leg_wall_distance/2],
+                    [Outer_leg_width/2,Leg_wall_distance/2],
+                    [Inner_leg_width/2,-Leg_wall_distance/2],
+                    [-Inner_leg_width/2,-Leg_wall_distance/2]
+                    ]);
+                }
+                else if (Leg_type == "T-Beam"){
+                    polygon([
+                    [-Outer_leg_width/2,Leg_wall_distance/2],
+                    [Outer_leg_width/2,Leg_wall_distance/2],
+                    [Outer_leg_width/2,(Leg_wall_distance/2)-Inner_leg_width],
+                    [Inner_leg_width/2,(Leg_wall_distance/2)-Inner_leg_width],
+                    [Inner_leg_width/2,-Leg_wall_distance/2],
+                    [-Inner_leg_width/2,-Leg_wall_distance/2],
+                    [-Inner_leg_width/2,(Leg_wall_distance/2)-Inner_leg_width],
+                    [-Outer_leg_width/2,(Leg_wall_distance/2)-Inner_leg_width]
+                    ]);
+                }
+                else if (Leg_type == "H-Beam"){
+                    polygon([
+                    [-Outer_leg_width/2,Leg_wall_distance/2],
+                    [Outer_leg_width/2,Leg_wall_distance/2],
+                    [Outer_leg_width/2,(Leg_wall_distance/2)-Inner_leg_width],
+                    [Inner_leg_width/2,(Leg_wall_distance/2)-Inner_leg_width],
+                    [Inner_leg_width/2,-((Leg_wall_distance/2)-Inner_leg_width)],
+                    [Outer_leg_width/2,-((Leg_wall_distance/2)-Inner_leg_width)],
+                    [Outer_leg_width/2,-Leg_wall_distance/2],
+                    [-Outer_leg_width/2,-Leg_wall_distance/2],
+                    [-Outer_leg_width/2,-((Leg_wall_distance/2)-Inner_leg_width)],
+                    [-Inner_leg_width/2,-((Leg_wall_distance/2)-Inner_leg_width)],
+                    [-Inner_leg_width/2,(Leg_wall_distance/2)-Inner_leg_width],
+                    [-Outer_leg_width/2,(Leg_wall_distance/2)-Inner_leg_width]
+                    ]);
+                }
+                
+            }
+            
+            // Vertical position of the top strut
+            Top_strut_z = Top_strut ? Total_height-Strut_thickness-Top_strut_offset : Total_height-Strut_thickness;
+            
+            // Vertical position of the top strut
+            Bottom_strut_z = Bottom_strut ? Bottom_strut_offset : 0;
+            
+            // Vertical position of the mid strut
+            Middle_strut_z = (Top_strut_z - Bottom_strut_z)/2+Bottom_strut_z;
+            
+            if (Bottom_strut){
+                // Difference between bottom strut and cutout
+                difference(){
+                    // Translate and rotate bottom strut
+                    translate([Inner_leg_width/2,-Leg_wall_distance/2,Bottom_strut_z])
+                    rotate([0,270,0])
+                    
+                    // Extrude bottom strut
+                    linear_extrude(height=Inner_leg_width){
+                    
+                        // Bottom strut polygon
+                        polygon(points=[
+                            [0-Strut_offset,0],
+                            [Strut_thickness,0],
+                            [Strut_thickness,-Diameter/2+Leg_wall_distance/2],
+                            [0,-Diameter/2+Leg_wall_distance/2]
+                        ]);
+                    }
+                    // Cutouts to prevent the bottom strut from going into negative height
+                    rotate([0,180,0])
+                    cylinder(d=Diameter,h=Diameter/2+Leg_wall_distance/2);
+                }
+            }
+            
+            if (Top_strut){
+                // Translate and rotate top strut
+                translate([Inner_leg_width/2,-Leg_wall_distance/2,Top_strut_z])
+                rotate([0,270,0])
+                
+                // Extrude top strut
+                linear_extrude(height=Inner_leg_width){
+                
+                    // Top strut polygon
+                    polygon(points=[
+                        [0-Strut_offset,0],
+                        [Strut_thickness,0],
+                        [Strut_thickness,-Diameter/2+Leg_wall_distance/2],
+                        [0,-Diameter/2+Leg_wall_distance/2]
+                    ]);
+                }
+            }
+            
+            if (Middle_strut){
+                // Translate and rotate mid strut
+                translate([Inner_leg_width/2,-Leg_wall_distance/2,Middle_strut_z])
+                rotate([0,270,0])
+                
+                // Extrude mid strut
+                linear_extrude(height=Inner_leg_width){
+                
+                    // Top mid polygon
+                    polygon(points=[
+                        [0-Strut_offset,0],
+                        [Strut_thickness,0],
+                        [Strut_thickness,-Diameter/2+Leg_wall_distance/2],
+                        [0,-Diameter/2+Leg_wall_distance/2]
+                    ]);
+                }
+            }
+
+        }
+
+    }
+
+    // Generate text
+    if(Enable_text){
+        for (Leg = [1:1:3]){
+            rotate([0,0,Leg*120-60])
+            translate([Diameter/2,0,0])
+            rotate([0,0,-90])
+            if (Leg == 1){
+                translate([-Text_size/2,Leg_wall_distance/2-Text_depth,Base_thickness*1.5])
+                rotate([0,270,270])
+                linear_extrude(height=Text_depth+1){
+                    text(Decoration_text,font=Text_font,size=Text_size);
+                }
+            } else if (Leg == 2){
+                translate([-Text_size/2,Leg_wall_distance/2-Text_depth,Base_thickness*1.5])
+                rotate([0,270,270])
+                linear_extrude(height=Text_depth+1){
+                    text(Text_frequency,font=Text_font,size=Text_size);
+                }
+            } else if (Leg == 3){
+                translate([-Text_size/2,Leg_wall_distance/2-Text_depth,Base_thickness*1.5])
+                rotate([0,270,270])
+                linear_extrude(height=Text_depth+1){
+                    text(Text_ID,font=Text_font,size=Text_size);
+                }
+            }
+        }
+    }
+
+    // Generate leg cutouts
+    for (Segment = [1:1:Total_segments]){
+        
+        Segment_offset = max(Cutout_diameter,((Segment*Spacing_distance/3)-Spacing_distance*Parallel_turn));
+        
+        // Rotate each segment by 120°, with a 60° offset (aligned with legs)
+        rotate([0,0,Segment*360/3*Pol_modifier-60*Pol_modifier]) 
+        
+        // Move each segment up by Spacing_distance/3 relative to previous segment)
+        translate([Diameter/2,0,Segment_offset])
+        
+        // Apply pitch to segment
+        rotate([90+(Segment_offset == Cutout_diameter ? 0 : Pitch),0,0])
+        
+        // Render segment
+        cylinder(r1=Cutout_diameter/2,r2=Cutout_diameter/2,h=Segment_height,center=true);
+    }
+
+}
+
+
+
+// Generate base
+difference(){
+    // Body union
+    union(){
+        // Base
+        cylinder(d=Diameter+Cutout_diameter*1.5+Base_width*2,h=Base_thickness);
+        
+        // Mounting spar
+        rotate([0,0,Mounting_rotation])
+        translate([0,0,Base_thickness/2])
+        cube([Mounting_diameter+Mounting_thickness*2,Mounting_separation,Base_thickness],center=true);
+        
+        // Mounting rims
+        rotate([0,0,Mounting_rotation])
+        translate([0,Mounting_separation/2,Base_thickness/2])
+        cylinder(d=Mounting_diameter+Mounting_thickness*2,h=Base_thickness,center=true);
+        rotate([0,0,Mounting_rotation])
+        translate([0,-Mounting_separation/2,Base_thickness/2])
+        cylinder(d=Mounting_diameter+Mounting_thickness*2,h=Base_thickness,center=true);
+    }
+
+    // Cutout union
+    union(){
+        // Segment cutout
+        if (Enable_cutout){
+            rotate([0,0,-45])
+            rotate_extrude(angle=90)
+            translate([Diameter/2+Base_width/2,0,0])
+            square([Base_width*2+Cutout_diameter*1.5,Base_thickness*3],center=true);
+        }
+
+        // Center cutout
+        translate([0,0,-1]) // Shift 1mm down to properly cut out
+        cylinder(d=Diameter+Cutout_diameter*1.5,h=Base_thickness+2);
+        
+        // Mounting holes
+        rotate([0,0,Mounting_rotation])
+        translate([0,Mounting_separation/2,Base_thickness/2])
+        cylinder(d=Mounting_diameter,h=Base_thickness+2,center=true);
+        rotate([0,0,Mounting_rotation])
+        translate([0,-Mounting_separation/2,Base_thickness/2])
+        cylinder(d=Mounting_diameter,h=Base_thickness+2,center=true);
+    }
+}
