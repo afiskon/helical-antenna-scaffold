@@ -11,5 +11,10 @@ The math is done by OpenSCAD.
 Also this repository includes an antenna cover and LNB mount for QO-100
 operation. The models are optimized for Bullseye LNB.
 
+Related articles (in Russian):
+
+* https://eax.me/2025/2025-10-20-helical-antenna.html
+* https://eax.me/2025/2025-11-21-qo-100-tx.html
+
 [1]: https://github.com/sgcderek
 [2]: http://dl2kq.de/ant/kniga/1345.htm
