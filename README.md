@@ -8,8 +8,12 @@ calculator. The calculation method is based on the [book by Igor, DL2KQ][2].
 You only specify the desired frequency and optionally other parameters.
 The math is done by OpenSCAD.
 
-Also this repository includes an antenna cover and LNB mount for QO-100
-operation. The models are optimized for Bullseye LNB.
+Also this repository includes:
+
+* An antenna cover and LNB mount for QO-100 operation. The models are
+  optimized for Bullseye LNB.
+* Reflector model for helicone antenna, see the paper [Design of Optimal
+  Ground Conductor for the Helical Antenna][3].
 
 Related articles (in Russian):
 
@@ -19,3 +23,4 @@ Related articles (in Russian):
 
 [1]: https://github.com/sgcderek
 [2]: http://dl2kq.de/ant/kniga/1345.htm
+[3]: http://home.etf.rs/~milanilic/publications/papers/Djordjevic-Etran06.pdf
