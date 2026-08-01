@@ -2,7 +2,7 @@ F_MHz = 2450;
 Lambda_mm = (299792458 / (F_MHz*1000000))*1000;
 max_width = 95;       // Maximum allowed width of the larger trapezoid base (mm)
 
-D1 = Lambda_mm*0.782; // Bottom diameter (mm)
+D1 = Lambda_mm*0.782 + 10; // Bottom diameter (mm)
 D2 = Lambda_mm*2.604; // Top diameter (mm, D2 > D1)
 H = Lambda_mm*0.6;    // Cone height (mm)
 t = 2;                // Wall and flange thickness (mm)
