@@ -52,7 +52,7 @@ half_angle = step_angle / 2;
 // MODULES
 // =================================================================
 
-// 1. Main trapezoidal wall segment of the cone
+// Main trapezoidal wall segment of the cone
 module main_wall_segment() {
     r1_out = D1 / 2;
     r1_in  = r1_out - t_rad;
@@ -68,6 +68,14 @@ module main_wall_segment() {
     a2_R = -half_angle + d_ang_2;
     a2_L =  half_angle - d_ang_2;
 
+    // Extend the INNER face to match full slant_len (where side_flange ends),
+    // keeping the outer face at H so the top cut remains exactly 90 deg to the print bed.
+    dh_in = t_rad * sin(alpha) * cos(alpha);
+    dr_in = t_rad * pow(sin(alpha), 2);
+
+    z_top_in  = H + dh_in;
+    r2_top_in = r2_in + dr_in;
+
     pts = [
         // Bottom base (z = 0)
         [ r1_out * cos(a1_R), r1_out * sin(a1_R), 0 ], // 0
@@ -75,11 +83,11 @@ module main_wall_segment() {
         [ r1_in  * cos(a1_L), r1_in  * sin(a1_L), 0 ], // 2
         [ r1_in  * cos(a1_R), r1_in  * sin(a1_R), 0 ], // 3
 
-        // Top base (z = H)
-        [ r2_out * cos(a2_R), r2_out * sin(a2_R), H ], // 4
-        [ r2_out * cos(a2_L), r2_out * sin(a2_L), H ], // 5
-        [ r2_in  * cos(a2_L), r2_in  * sin(a2_L), H ], // 6
-        [ r2_in  * cos(a2_R), r2_in  * sin(a2_R), H ]  // 7
+        // Top base (Outer at H, Inner extended to match side_flange)
+        [ r2_out    * cos(a2_R), r2_out    * sin(a2_R), H ],        // 4: Outer Right
+        [ r2_out    * cos(a2_L), r2_out    * sin(a2_L), H ],        // 5: Outer Left
+        [ r2_top_in * cos(a2_L), r2_top_in * sin(a2_L), z_top_in ], // 6: Inner Left (Extended)
+        [ r2_top_in * cos(a2_R), r2_top_in * sin(a2_R), z_top_in ]  // 7: Inner Right (Extended)
     ];
 
     faces = [
@@ -94,7 +102,7 @@ module main_wall_segment() {
     polyhedron(points = pts, faces = faces);
 }
 
-// 2. Side mounting flange (ear) with screw holes
+// Side mounting flange (ear) with screw holes
 module side_flange(side = 1) { // side: 1 - left joint, -1 - right joint
     slant_len = sqrt(pow(H, 2) + pow((D2 - D1) / 2, 2));
     
@@ -133,7 +141,7 @@ module side_flange(side = 1) { // side: 1 - left joint, -1 - right joint
     }
 }
 
-// 3. Bottom mounting flange extending OUTWARD with heat-set insert hole
+// Bottom mounting flange extending OUTWARD with heat-set insert hole
 module bottom_mount_flange() {
     r1_out = D1 / 2;
     r_ext  = r1_out + bottom_flange_w;
@@ -181,7 +189,7 @@ module bottom_mount_flange() {
     }
 }
 
-// 4. Complete solid segment module
+// Complete solid segment module
 module full_trapezoid_segment() {
     union() {
         main_wall_segment();
@@ -219,8 +227,8 @@ for (i = [0 : N - 1]) {
         full_trapezoid_segment();
 }
 
-//translate([0, 0, -20])
-//    holes_template();
+translate([0, 0, -20])
+    holes_template();
 
 // #cylinder(d = D1 - d1_correction, h = 200, center = true);
 
