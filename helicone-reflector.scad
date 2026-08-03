@@ -2,8 +2,17 @@ F_MHz = 2450;
 Lambda_mm = (299792458 / (F_MHz*1000000))*1000;
 max_width = 95;       // Maximum allowed width of the larger trapezoid base (mm)
 
-D1 = Lambda_mm*0.782 + 10; // Bottom diameter (mm)
-D2 = Lambda_mm*2.604; // Top diameter (mm, D2 > D1)
+// Make sure the bottom N-gon does not collapse inside the D1 circle
+// The value 10 works OK for F_MHz in 1691..2450 range
+// Set to 0 if preserving ideal cone angles is more important
+d1_correction = 10;
+
+// You can also experiment with D2 correction
+// Personally I doubt that it affects much the overall antenna gain
+d2_correction = 0;
+
+D1 = Lambda_mm*0.782 + d1_correction; // Bottom diameter (mm)
+D2 = Lambda_mm*2.604 + d2_correction; // Top diameter (mm, D2 > D1)
 H = Lambda_mm*0.6;    // Cone height (mm)
 t = 2;                // Wall and flange thickness (mm)
 
@@ -210,8 +219,22 @@ for (i = [0 : N - 1]) {
         full_trapezoid_segment();
 }
 
-translate([0, 0, -20])
-    holes_template();
+//translate([0, 0, -20])
+//    holes_template();
 
+// #cylinder(d = D1 - d1_correction, h = 200, center = true);
+
+// the reference ideal cone without corrections
+/*
+#difference() {
+    cylinder(d1 = D1-d1_correction+2*t, d2 = D2-d2_correction+2*t, h = H);
+    translate([0,0,-eps/2])
+        cylinder(d1 = D1-d1_correction, d2 = D2-d2_correction, h = H+eps);
+}
+*/
+
+// 3D-printable parts:
+//
 // full_trapezoid_segment();
 // holes_template();
+
