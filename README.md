@@ -19,7 +19,7 @@ Related articles (in Russian):
 
 * https://eax.me/2025/2025-10-20-helical-antenna.html
 * https://eax.me/2025/2025-11-21-qo-100-tx.html
-* https://eax.me/2026/2026-05-13-qo-100-upconverter.html
+* https://eax.me/2026/2026-08-05-helicone-antenna.html
 
 [1]: https://github.com/sgcderek
 [2]: http://dl2kq.de/ant/kniga/1345.htm
