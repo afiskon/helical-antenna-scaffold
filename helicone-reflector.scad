@@ -258,6 +258,7 @@ module base() {
 // =================================================================
 
 // Preview entire assembly:
+/*
 for (i = [0 : N - 1]) {
     rotate([0, 0, i * step_angle])
         full_trapezoid_segment();
@@ -265,6 +266,7 @@ for (i = [0 : N - 1]) {
 
 translate([0, 0, -20])
     base();
+*/
 
 // #cylinder(d = D1 - d1_correction, h = 200, center = true);
 
@@ -279,6 +281,6 @@ translate([0, 0, -20])
 
 // 3D-printable parts:
 //
-// full_trapezoid_segment();
+full_trapezoid_segment();
 // base();
 
