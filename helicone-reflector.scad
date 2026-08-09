@@ -1,6 +1,9 @@
 F_MHz = 2450;
 Lambda_mm = (299792458 / (F_MHz*1000000))*1000;
-max_width = 95;       // Maximum allowed width of the larger trapezoid base (mm)
+max_width = 25;       // Maximum allowed width of the larger trapezoid base (mm)
+
+mounting_holes_dia = 7;   // see helical-antenna.scad, Mounting_separation
+mounting_separation = 70; // see helical-antenna.scad, Mounting_diameter
 
 // Make sure the bottom N-gon does not collapse inside the D1 circle
 // The value 10 works OK for F_MHz in 1691..2450 range
@@ -30,7 +33,7 @@ bottom_h = 8;            // Height/thickness of the bottom mounting flange (mm)
 bottom_flange_w = 20;    // Width of the bottom flange extending outward (mm)
 insert_d = 3.7;          // Hole diameter for heat-set insert (mm)
 
-$fn = 32;         // Resolution for cylindrical holes
+$fn = 100;
 
 // =================================================================
 // GEOMETRY CALCULATIONS
@@ -199,22 +202,55 @@ module full_trapezoid_segment() {
     }
 }
 
-module holes_template() {
-    difference() {
-        cylinder(h = t, d = D1 + 2*bottom_flange_w, center = true, $fn = 100);
-        cylinder(h = t*2, d = D1, center = true, $fn = 100);
+module typen_holes() {
+    typen_center = 18.2;
+    typen_screw_hole = 3.7;
+    typen_screw_hole_offset = 18/2;
+    typen_height = 10;
+    typen_deepening = 2.5;
+
+    cylinder(d = typen_center, h = typen_height, center = true);
+    translate([typen_screw_hole_offset, typen_screw_hole_offset, 0])
+        cylinder(d = typen_screw_hole, h = typen_height, center = true);
+    translate([typen_screw_hole_offset, -typen_screw_hole_offset, 0])
+        cylinder(d = typen_screw_hole, h = typen_height, center = true);
+    translate([-typen_screw_hole_offset, typen_screw_hole_offset, 0])
+        cylinder(d = typen_screw_hole, h = typen_height, center = true);
+    translate([-typen_screw_hole_offset, -typen_screw_hole_offset, 0])
+        cylinder(d = typen_screw_hole, h = typen_height, center = true);
+}
+
+module base() {
+    translate([0, 0, -30]) difference() {
+        cylinder(d = D1 + 2*bottom_flange_w, h = t*2, center = true);
+
+        translate([0, -(D1 - d1_correction)/2 + 25/2 + 3, 0])
+            typen_holes();
+        translate([mounting_separation/2, 0, 0])
+            cylinder(d = mounting_holes_dia, h = 100, center = true);
+        translate([-mounting_separation/2, 0, 0])
+            cylinder(d = mounting_holes_dia, h = 100, center = true);
 
         for (i = [0 : N - 1]) {
             rotate([0, 0, i * step_angle]) {
                 r1_out = D1 / 2;
                 r_ext  = r1_out + bottom_flange_w;
                 hole_radius = r1_out + (bottom_flange_w / 2);
-                
-                translate([hole_radius, 0, -t/2-eps])
-                    cylinder(d = insert_d, h = bottom_h + 2 * eps);
+
+                translate([hole_radius, 0, -50])
+                    cylinder(d = insert_d, h = 100);
             }
         }
     }
+
+/*
+    difference() {
+        cylinder(h = t, d = D1 + 2*bottom_flange_w, center = true, $fn = 100);
+        cylinder(h = t*2, d = D1, center = true, $fn = 100);
+
+
+    }
+*/
 }
 
 // =================================================================
@@ -228,7 +264,7 @@ for (i = [0 : N - 1]) {
 }
 
 translate([0, 0, -20])
-    holes_template();
+    base();
 
 // #cylinder(d = D1 - d1_correction, h = 200, center = true);
 
@@ -244,5 +280,5 @@ translate([0, 0, -20])
 // 3D-printable parts:
 //
 // full_trapezoid_segment();
-// holes_template();
+// base();
 
