@@ -99,7 +99,7 @@ Mounting_rotation = 0;
 Enable_text = true;
 
 // Custom decoration text (set to none to disable)
-Decoration_text = "Alex R2AUK        2025";
+Decoration_text = "Alex R2AUK        2026";
 
 // Depth of the text engraving (mm)
 Text_depth = 0.75;
@@ -178,6 +178,8 @@ Strut_offset = ((Diameter/2)/tan(Strut_angle))-Leg_wall_distance/2;
 
 // Total scaffold height (mm)
 Total_height = (Turns_rounded*Spacing_distance+Cutout_diameter*3)-Spacing_distance*Parallel_turn;
+
+echo(str("Total scaffold height: ", Total_height, " mm"));
 
 // Thicknes of the top part of each strut (mm)
 Strut_thickness = 3; // Total_height;
