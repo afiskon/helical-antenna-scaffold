@@ -224,8 +224,12 @@ module base() {
     translate([0, 0, -30]) difference() {
         cylinder(d = D1 + 2*bottom_flange_w, h = t*2, center = true);
 
-        translate([0, -(D1 - d1_correction)/2 + 25/2 + 3, 0])
+        translate([0, -(D1 - d1_correction)/2 + 25/2 + 1, 0]) {
             typen_holes();
+            translate([0, 0, (t*2)/2 + 2.5/2 - 2.5 + eps])
+                cube([25.5, 25.5, 2.5], center=true);
+        }
+
         translate([mounting_separation/2, 0, 0])
             cylinder(d = mounting_holes_dia, h = 100, center = true);
         translate([-mounting_separation/2, 0, 0])
@@ -242,15 +246,6 @@ module base() {
             }
         }
     }
-
-/*
-    difference() {
-        cylinder(h = t, d = D1 + 2*bottom_flange_w, center = true, $fn = 100);
-        cylinder(h = t*2, d = D1, center = true, $fn = 100);
-
-
-    }
-*/
 }
 
 // =================================================================
