@@ -1,4 +1,4 @@
-# Helical Antenna Scaffold and Calculator
+# Helical / Helicone Antenna Scaffold and Calculator
 
 This is a fork of 3D printable helical antenna scaffold implemented
 by [@sgcderek][1] in 2021-2023.
