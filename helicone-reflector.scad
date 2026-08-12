@@ -2,8 +2,8 @@ F_MHz = 2450;
 Lambda_mm = (299792458 / (F_MHz*1000000))*1000;
 max_width = 25;       // Maximum allowed width of the larger trapezoid base (mm)
 
-mounting_holes_dia = 7;   // see helical-antenna.scad, Mounting_separation
-mounting_separation = 70; // see helical-antenna.scad, Mounting_diameter
+mounting_holes_dia = 7;   // see helical-antenna.scad, Mounting_diameter
+mounting_separation = 70; // see helical-antenna.scad, Mounting_separation
 
 // Make sure the bottom N-gon does not collapse inside the D1 circle
 // The value 10 works OK for F_MHz in 1691..2450 range
