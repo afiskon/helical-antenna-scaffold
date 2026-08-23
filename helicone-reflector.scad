@@ -277,3 +277,9 @@ translate([0, 0, -20])
 // full_trapezoid_segment();
 // base();
 
+
+// Round reflector for a regular helical antenna:
+// intersection() {
+//     base();
+//     cylinder(h = 100, d = 0.8*Lambda_mm, center = true);
+// }
