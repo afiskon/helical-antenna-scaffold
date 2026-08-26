@@ -15,21 +15,16 @@ Frequency = 2450;
 Spacing = 0.23; // [0.22..0.24]
 
 // Number of turns of the helix
-Turns = 5.6; // [3..25]
+Turns = 5; // [3..25]
+
+// Vertical offset of the first (bottom) hole (mm)
+Bottom_hole_offset = 2.5;
 
 // Polarization of the helix
 Polarization = "LHCP"; //[RHCP,LHCP]
 
 // Diameter of the holes for the helix conductor (mm)
 Cutout_diameter = 3.5;
-
-// How much of the first turn is parallel to the reflector
-// This turn is used as a quarter wave impedance transformer
-// with wire over ground transmission line.
-// See:
-// - https://en.wikipedia.org/wiki/Quarter-wave_impedance_transformer
-// - https://www.microwaves101.com/encyclopedias/wire-over-ground-transmission-line
-Parallel_turn = 0.25;
 
 // Face number (OpenSCAD/Customizer parameter)
 $fn = 50;
@@ -115,9 +110,6 @@ Text_size_multiplier = 0.8;
 // Polarization modifier (RHCP = 1, LHCP = -1)
 Pol_modifier = (Polarization == "RHCP") ? 1 : -1;
 
-// This rounds down the turn number to not render too much unused scaffold area (somehow?)
-Turns_rounded = floor((Turns+0.01)/(1/3))*(1/3)-(1/6);
-
 // Speed of light (m/s)
 C = 299792458;
 
@@ -180,7 +172,7 @@ Segment_height = max(Inner_leg_width, Outer_leg_width)*1.1;
 Strut_offset = ((Diameter/2)/tan(Strut_angle))-Leg_wall_distance/2;
 
 // Total scaffold height (mm)
-Total_height = (Turns_rounded*Spacing_distance+Cutout_diameter*3)-Spacing_distance*Parallel_turn;
+Total_height = Bottom_hole_offset + Turns * Spacing_distance + Cutout_diameter * 1.5;
 
 echo(str("Total scaffold height: ", Total_height, " mm"));
 
@@ -349,26 +341,24 @@ difference(){
     }
 
     // Generate leg cutouts
-    for (Segment = [1:1:Total_segments]){
+    for (Segment = [0:1:Total_segments]){
         
-        Segment_offset = max(Cutout_diameter,((Segment*Spacing_distance/3)-Spacing_distance*Parallel_turn));
+        Segment_offset = Bottom_hole_offset + Cutout_diameter/2 + (Segment * Spacing_distance / 3);
         
-        // Rotate each segment by 120°, with a 60° offset (aligned with legs)
-        rotate([0,0,Segment*360/3*Pol_modifier-60*Pol_modifier]) 
+        // Rotate each segment: starting hole at -60° for LHCP (left leg) and +60° for RHCP (right leg)
+        rotate([0,0,Segment*360/3*Pol_modifier + 60*Pol_modifier])
         
-        // Move each segment up by Spacing_distance/3 relative to previous segment)
+        // Move each segment up relative to previous segment
         translate([Diameter/2,0,Segment_offset])
         
         // Apply pitch to segment
-        rotate([90+(Segment_offset == Cutout_diameter ? 0 : Pitch),0,0])
+        rotate([90+Pitch,0,0])
         
         // Render segment
         cylinder(r1=Cutout_diameter/2,r2=Cutout_diameter/2,h=Segment_height,center=true);
     }
 
 }
-
-
 
 // Generate base
 difference(){
