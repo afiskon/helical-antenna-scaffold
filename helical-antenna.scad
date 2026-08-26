@@ -73,6 +73,9 @@ Bottom_strut_offset = 0;
 // Total number of struts above the base (minimum 1, top strut is included)
 Struts_number = 2;
 
+// Make middle struts symmetrical along Z axis with X-shaped overhangs
+Symmetrical_struts = false;
+
 // Generate a strut at the top of the scaffold (recommended for most scaffolds)
 Top_strut = true;
 
@@ -292,16 +295,19 @@ difference(){
                 Strut_step = (Top_strut_z - Bottom_strut_z) / Struts_number;
                 
                 for (i = [1 : Struts_number]) {
+                    is_top = (i == Struts_number);
+
                     // Skip rendering the last iteration if Top_strut is false
-                    if (i < Struts_number || Top_strut) {
+                    if (!is_top || Top_strut) {
                         Current_strut_z = Bottom_strut_z + i * Strut_step;
+                        use_sym = Symmetrical_struts && !is_top;
 
                         translate([Inner_leg_width/2, -Leg_wall_distance/2, Current_strut_z])
                         rotate([0, 270, 0])
                         linear_extrude(height=Inner_leg_width) {
                             polygon(points=[
                                 [0-Strut_offset, 0],
-                                [Strut_thickness, 0],
+                                [use_sym ? Strut_thickness+Strut_offset : Strut_thickness, 0],
                                 [Strut_thickness, -Diameter/2+Leg_wall_distance/2],
                                 [0, -Diameter/2+Leg_wall_distance/2]
                             ]);
