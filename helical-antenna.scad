@@ -15,7 +15,7 @@ Frequency = 2450;
 Spacing = 0.23; // [0.22..0.24]
 
 // Number of turns of the helix
-Turns = 5; // [3..25]
+Turns = 5.6; // [3..25]
 
 // Polarization of the helix
 Polarization = "LHCP"; //[RHCP,LHCP]
@@ -70,8 +70,8 @@ Bottom_strut = true;
 // How much to shift the bottom strut up (mm)
 Bottom_strut_offset = 0;
 
-// Generate a strut in the middle of the scaffold (recommended for tall scaffolds)
-Middle_strut = true;
+// Total number of struts above the base (minimum 1, top strut is included)
+Struts_number = 2;
 
 // Generate a strut at the top of the scaffold (recommended for most scaffolds)
 Top_strut = true;
@@ -260,11 +260,8 @@ difference(){
             // Vertical position of the top strut
             Top_strut_z = Top_strut ? Total_height-Strut_thickness-Top_strut_offset : Total_height-Strut_thickness;
             
-            // Vertical position of the top strut
+            // Vertical position of the bottom strut
             Bottom_strut_z = Bottom_strut ? Bottom_strut_offset : 0;
-            
-            // Vertical position of the mid strut
-            Middle_strut_z = (Top_strut_z - Bottom_strut_z)/2+Bottom_strut_z;
             
             if (Bottom_strut){
                 // Difference between bottom strut and cutout
@@ -290,39 +287,26 @@ difference(){
                 }
             }
             
-            if (Top_strut){
-                // Translate and rotate top strut
-                translate([Inner_leg_width/2,-Leg_wall_distance/2,Top_strut_z])
-                rotate([0,270,0])
+            // Generate evenly spaced struts above the bottom strut
+            if (Struts_number >= 1) {
+                Strut_step = (Top_strut_z - Bottom_strut_z) / Struts_number;
                 
-                // Extrude top strut
-                linear_extrude(height=Inner_leg_width){
-                
-                    // Top strut polygon
-                    polygon(points=[
-                        [0-Strut_offset,0],
-                        [Strut_thickness,0],
-                        [Strut_thickness,-Diameter/2+Leg_wall_distance/2],
-                        [0,-Diameter/2+Leg_wall_distance/2]
-                    ]);
-                }
-            }
-            
-            if (Middle_strut){
-                // Translate and rotate mid strut
-                translate([Inner_leg_width/2,-Leg_wall_distance/2,Middle_strut_z])
-                rotate([0,270,0])
-                
-                // Extrude mid strut
-                linear_extrude(height=Inner_leg_width){
-                
-                    // Top mid polygon
-                    polygon(points=[
-                        [0-Strut_offset,0],
-                        [Strut_thickness,0],
-                        [Strut_thickness,-Diameter/2+Leg_wall_distance/2],
-                        [0,-Diameter/2+Leg_wall_distance/2]
-                    ]);
+                for (i = [1 : Struts_number]) {
+                    // Skip rendering the last iteration if Top_strut is false
+                    if (i < Struts_number || Top_strut) {
+                        Current_strut_z = Bottom_strut_z + i * Strut_step;
+
+                        translate([Inner_leg_width/2, -Leg_wall_distance/2, Current_strut_z])
+                        rotate([0, 270, 0])
+                        linear_extrude(height=Inner_leg_width) {
+                            polygon(points=[
+                                [0-Strut_offset, 0],
+                                [Strut_thickness, 0],
+                                [Strut_thickness, -Diameter/2+Leg_wall_distance/2],
+                                [0, -Diameter/2+Leg_wall_distance/2]
+                            ]);
+                        }
+                    }
                 }
             }
 
