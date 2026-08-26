@@ -3,10 +3,14 @@
 This is a fork of 3D printable helical antenna scaffold implemented
 by [@sgcderek][1] in 2021-2023.
 
-The difference from the original is that this project has a built-in antenna
-calculator. The calculation method is based on the [book by Igor, DL2KQ][2].
-You only specify the desired frequency and optionally other parameters.
-The math is done by OpenSCAD.
+One major difference from the original is that this project has a built-in
+antenna calculator. The calculation method is based on the
+[book by Igor, DL2KQ][2]. You only specify the desired frequency and optionally
+other parameters. The math is done by OpenSCAD.
+
+Besides that you can specify as many struts as you want and make them
+symmetrical along the Z axis. This is useful when printing large antennas
+in two or more parts and then gluing them.
 
 Also this repository includes:
 

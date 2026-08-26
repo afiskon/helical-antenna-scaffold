@@ -73,7 +73,7 @@ Bottom_strut_offset = 0;
 // Total number of struts above the base (minimum 1, top strut is included)
 Struts_number = 2;
 
-// Make middle struts symmetrical along Z axis with X-shaped overhangs
+// Make middle struts symmetrical along the Z axis with X-shaped overhangs
 Symmetrical_struts = false;
 
 // Generate a strut at the top of the scaffold (recommended for most scaffolds)
