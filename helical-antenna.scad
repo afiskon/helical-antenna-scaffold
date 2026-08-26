@@ -188,8 +188,8 @@ Text_size = Outer_leg_width*0.75*Text_size_multiplier;
 // Frequency text
 Text_frequency = str(Frequency, " MHz          ", Polarization /*, " ", Material*/);
 
-// ID text
-Text_ID = str(Turns, " TURNS    ", Spacing, " STEP");
+// Diameter, Pitch
+Text_ID = str("Dia ", round(Diameter_wl*100)/100, "   Pitch ", round(Spacing*100)/100);
 
 // Difference between legs and leg cutouts
 difference(){
