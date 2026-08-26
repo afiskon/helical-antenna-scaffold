@@ -16,8 +16,8 @@ Also this repository includes:
 
 * An antenna cover and LNB mount for QO-100 operation. The models are
   optimized for Bullseye LNB.
-* Reflector model for helicone antenna, see the paper [Design of Optimal
-  Ground Conductor for the Helical Antenna][3].
+* Reflector model for helicone antenna, designed according to the paper
+  [Design of Optimal Ground Conductor for the Helical Antenna][3].
 
 Related articles (in Russian):
 
