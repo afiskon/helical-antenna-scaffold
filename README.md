@@ -1,12 +1,15 @@
-# Helical / Helicone Antenna Scaffold and Calculator
+# Helical Antenna Scaffold and Calculator
 
 This is a fork of 3D printable helical antenna scaffold implemented
 by [@sgcderek][1] in 2021-2023.
 
 One major difference from the original is that this project has a built-in
-antenna calculator. The calculation method is based on the
+helical antenna calculator. The calculation method is based on the
 [book by Igor, DL2KQ][2]. You only specify the desired frequency and optionally
 other parameters. The math is done by OpenSCAD.
+
+**Important!** Optimal parameters for helicone and helical antenna are different.
+See the list of related articles, particularly [this one][4].
 
 Besides that you can specify as many struts as you want and make them
 symmetrical along the Z axis. This is useful when printing large antennas
@@ -25,7 +28,9 @@ Related articles (in Russian):
 * https://eax.me/2025/2025-11-21-qo-100-tx.html
 * https://eax.me/2026/2026-08-05-helicone-antenna.html
 * https://eax.me/2026/2026-09-02-meteor-m2-hrpt.html
+* https://eax.me/2026/2026-09-09-helicone-antenna-modeling.html
 
 [1]: https://github.com/sgcderek
 [2]: http://dl2kq.de/ant/kniga/1345.htm
 [3]: http://home.etf.rs/~milanilic/publications/papers/Djordjevic-Etran06.pdf
+[4]: https://eax.me/2026/2026-09-09-helicone-antenna-modeling.html
