@@ -29,6 +29,7 @@ Related articles (in Russian):
 * https://eax.me/2026/2026-08-05-helicone-antenna.html
 * https://eax.me/2026/2026-09-02-meteor-m2-hrpt.html
 * https://eax.me/2026/2026-09-09-helicone-antenna-modeling.html
+* https://eax.me/2026/2026-09-16-metop.html
 
 [1]: https://github.com/sgcderek
 [2]: http://dl2kq.de/ant/kniga/1345.htm
