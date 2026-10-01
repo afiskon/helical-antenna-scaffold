@@ -19,7 +19,7 @@ Also this repository includes:
 * Reflector model for helicone antenna, designed according to the paper
   [Design of Optimal Ground Conductor for the Helical Antenna][3].
 
-**Important!** Optimal parameters for helicone and helical antenna are different.
+Note that optimal parameters for helicone and helical antenna differ.
 See the list of related articles, particularly #5.
 
 Related articles (in Russian):
